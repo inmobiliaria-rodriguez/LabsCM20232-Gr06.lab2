@@ -98,6 +98,7 @@ fun ArticleScreen(
         val context = LocalContext.current
         ArticleScreenContent(
             post = post,
+            //Prueba
             // Allow opening the Drawer if the screen is not expanded
             navigationIconContent = {
                 if (!isExpandedScreen) {
