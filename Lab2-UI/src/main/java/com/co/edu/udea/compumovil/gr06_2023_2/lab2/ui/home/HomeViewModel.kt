@@ -22,7 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.R
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.Result
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.PostsRepository
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Post
+import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.Post
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.PostsFeed
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.utils.ErrorMessage
 import java.util.UUID
@@ -104,7 +104,7 @@ private data class HomeViewModelState(
                 // If there is none (or that post isn't in the current feed), default to the
                 // highlighted post
                 selectedPost = postsFeed.allPosts.find {
-                    it.id == selectedPostId
+                    it.source.id == selectedPostId
                 } ?: postsFeed.highlightedPost,
                 isArticleOpen = isArticleOpen,
                 favorites = favorites,
@@ -178,7 +178,7 @@ class HomeViewModel(
     /**
      * Toggle favorite of a post
      */
-    fun toggleFavourite(postId: String) {
+    fun toggleFavourite(postId: String?) {
         viewModelScope.launch {
             postsRepository.toggleFavorite(postId)
         }
@@ -187,7 +187,7 @@ class HomeViewModel(
     /**
      * Selects the given article to view more information about it.
      */
-    fun selectArticle(postId: String) {
+    fun selectArticle(postId: String?) {
         // Treat selecting a detail as simply interacting with it
         interactedWithArticleDetails(postId)
     }
@@ -214,7 +214,7 @@ class HomeViewModel(
     /**
      * Notify that the user interacted with the article details
      */
-    fun interactedWithArticleDetails(postId: String) {
+    fun interactedWithArticleDetails(postId: String?) {
         viewModelState.update {
             it.copy(
                 selectedPostId = postId,

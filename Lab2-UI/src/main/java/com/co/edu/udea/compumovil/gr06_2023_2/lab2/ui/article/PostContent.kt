@@ -16,7 +16,6 @@
 
 package com.co.edu.udea.compumovil.gr06_2023_2.lab2.ui.article
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -33,7 +32,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -51,8 +49,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
@@ -64,19 +62,18 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.R
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.post3
+import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.Post
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Markup
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.MarkupType
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Metadata
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Paragraph
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.ParagraphType
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Post
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.ui.theme.JetnewsTheme
 
 private val defaultSpacerSize = 16.dp
 
@@ -99,15 +96,15 @@ fun LazyListScope.postContentItems(post: Post) {
     item {
         PostHeaderImage(post)
         Spacer(Modifier.height(defaultSpacerSize))
-        Text(post.title, style = MaterialTheme.typography.headlineLarge)
+        post.title?.let { Text(it, style = MaterialTheme.typography.headlineLarge) }
         Spacer(Modifier.height(8.dp))
-        if (post.subtitle != null) {
-            Text(post.subtitle, style = MaterialTheme.typography.bodyMedium)
+        if (post.description != null) {
+            Text(post.description, style = MaterialTheme.typography.bodyMedium)
             Spacer(Modifier.height(defaultSpacerSize))
         }
     }
-    item { PostMetadata(post.metadata, Modifier.padding(bottom = 24.dp)) }
-    items(post.paragraphs) { Paragraph(paragraph = it) }
+    item { PostMetadata(com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Metadata(post.author,post.publishedAt), Modifier.padding(bottom = 24.dp)) }
+    item { Paragraph(post.content ) }
 }
 
 @Composable
@@ -116,11 +113,14 @@ private fun PostHeaderImage(post: Post) {
         .heightIn(min = 180.dp)
         .fillMaxWidth()
         .clip(shape = MaterialTheme.shapes.medium)
-    Image(
-        painter = painterResource(post.imageId),
-        contentDescription = null, // decorative
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(post.urlToImage)
+            .crossfade(true)
+            .build(),
+        contentDescription = null,
         modifier = imageModifier,
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Crop,
     )
 }
 
@@ -341,14 +341,3 @@ fun Markup.toAnnotatedStringItem(
 
 private val ColorScheme.codeBlockBackground: Color
     get() = onSurface.copy(alpha = .15f)
-
-@Preview("Post content")
-@Preview("Post content (dark)", uiMode = UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewPost() {
-    JetnewsTheme {
-        Surface {
-            PostContent(post = post3)
-        }
-    }
-}

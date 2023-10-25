@@ -17,7 +17,7 @@
 package com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts
 
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.Result
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Post
+import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.Post
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.PostsFeed
 import kotlinx.coroutines.flow.Flow
 
@@ -49,5 +49,5 @@ interface PostsRepository {
     /**
      * Toggle a postId to be a favorite or not.
      */
-    suspend fun toggleFavorite(postId: String)
+    suspend fun toggleFavorite(postId: String?)
 }

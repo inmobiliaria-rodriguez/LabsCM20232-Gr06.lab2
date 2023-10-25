@@ -83,12 +83,12 @@ fun HomeRoute(
 fun HomeRoute(
     uiState: HomeUiState,
     isExpandedScreen: Boolean,
-    onToggleFavorite: (String) -> Unit,
-    onSelectPost: (String) -> Unit,
+    onToggleFavorite: (String?) -> Unit,
+    onSelectPost: (String?) -> Unit,
     onRefreshPosts: () -> Unit,
     onErrorDismiss: (Long) -> Unit,
     onInteractWithFeed: () -> Unit,
-    onInteractWithArticleDetails: (String) -> Unit,
+    onInteractWithArticleDetails: (String?) -> Unit,
     onSearchInputChanged: (String) -> Unit,
     openDrawer: () -> Unit,
     snackbarHostState: SnackbarHostState
@@ -101,8 +101,8 @@ fun HomeRoute(
         is HomeUiState.HasPosts -> uiState.postsFeed.allPosts
         is HomeUiState.NoPosts -> emptyList()
     }.associate { post ->
-        key(post.id) {
-            post.id to rememberLazyListState()
+        key(post.source.id) {
+            post.source.id to rememberLazyListState()
         }
     }
 
@@ -147,12 +147,12 @@ fun HomeRoute(
                 post = uiState.selectedPost,
                 isExpandedScreen = isExpandedScreen,
                 onBack = onInteractWithFeed,
-                isFavorite = uiState.favorites.contains(uiState.selectedPost.id),
+                isFavorite = uiState.favorites.contains(uiState.selectedPost.source.id),
                 onToggleFavorite = {
-                    onToggleFavorite(uiState.selectedPost.id)
+                    onToggleFavorite(uiState.selectedPost.source.id)
                 },
                 lazyListState = articleDetailLazyListStates.getValue(
-                    uiState.selectedPost.id
+                    uiState.selectedPost.source.id
                 )
             )
 

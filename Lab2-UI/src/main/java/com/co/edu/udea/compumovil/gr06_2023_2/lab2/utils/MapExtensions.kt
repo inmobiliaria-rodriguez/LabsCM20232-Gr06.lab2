@@ -16,9 +16,9 @@
 
 package com.co.edu.udea.compumovil.gr06_2023_2.lab2.utils
 
-internal fun <E> Set<E>.addOrRemove(element: E): Set<E> {
+internal fun <E> Set<E>.addOrRemove(element: E?): Set<E> {
     return this.toMutableSet().apply {
-        if (!add(element)) {
+        if (!element?.let { add(it) }!!) {
             remove(element)
         }
     }.toSet()

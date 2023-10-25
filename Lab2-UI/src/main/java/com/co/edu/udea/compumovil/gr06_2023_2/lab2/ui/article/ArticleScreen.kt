@@ -59,8 +59,8 @@ import androidx.compose.ui.unit.dp
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.R
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.Result
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.BlockingFakePostsRepository
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.post3
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Post
+import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.Post
+import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.Source
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.ui.theme.JetnewsTheme
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.ui.utils.BookmarkButton
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.ui.utils.FavoriteButton
@@ -148,7 +148,7 @@ private fun ArticleScreenContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = post.publication?.name.orEmpty(),
+                title = post.title.orEmpty(),
                 navigationIconContent = navigationIconContent,
                 scrollBehavior = scrollBehavior
             )
@@ -247,7 +247,16 @@ fun sharePost(post: Post, context: Context) {
 fun PreviewArticleDrawer() {
     JetnewsTheme {
         val post = runBlocking {
-            (BlockingFakePostsRepository().getPost(post3.id) as Result.Success).data
+            (Post(Source(
+                "csds-fdgs",
+                "Nombre"),
+                "Autor",
+                "Titulo pro",
+                "Descripción re larga",
+                "hhtttptm",
+                "httptm de imagen",
+                "una fecha",
+                "mucho texto",))
         }
         ArticleScreen(post, false, {}, false, {})
     }
@@ -264,7 +273,16 @@ fun PreviewArticleDrawer() {
 fun PreviewArticleNavRail() {
     JetnewsTheme {
         val post = runBlocking {
-            (BlockingFakePostsRepository().getPost(post3.id) as Result.Success).data
+            (Post(Source(
+                "csds-fdgs",
+                "Nombre"),
+                "Autor",
+                "Titulo pro",
+                "Descripción re larga",
+                "hhtttptm",
+                "httptm de imagen",
+                "una fecha",
+                "mucho texto",))
         }
         ArticleScreen(post, true, {}, false, {})
     }

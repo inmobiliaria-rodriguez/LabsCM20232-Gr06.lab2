@@ -18,7 +18,13 @@ package com.co.edu.udea.compumovil.gr06_2023_2.lab2.glance.ui
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -43,10 +49,12 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.Text
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.JetnewsApplication.Companion.JETNEWS_APP_URI
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.R
+import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.Post
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.glance.ui.theme.JetnewsGlanceTextStyles
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Post
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.ui.MainActivity
 
 enum class PostLayout { HORIZONTAL_SMALL, HORIZONTAL_LARGE, VERTICAL }
@@ -59,16 +67,16 @@ fun DpSize.toPostLayout(): PostLayout {
     }
 }
 
-private fun Context.authorReadTimeString(author: String, readTimeMinutes: Int) =
+private fun Context.authorReadTimeString(author: String?) =
     getString(R.string.home_post_min_read)
-        .format(author, readTimeMinutes)
+        .format(author)
 
 private fun openPostDetails(context: Context, post: Post): Action {
     // actionStartActivity is the preferred way to start activities.
     return actionStartActivity(
         Intent(
             Intent.ACTION_VIEW,
-            "$JETNEWS_APP_URI/home?postId=${post.id}".toUri(),
+            "$JETNEWS_APP_URI/home?postId=${post.source.id}".toUri(),
             context,
             MainActivity::class.java
         )
@@ -79,7 +87,7 @@ private fun openPostDetails(context: Context, post: Post): Action {
 fun Post(
     post: Post,
     bookmarks: Set<String>,
-    onToggleBookmark: (String) -> Unit,
+    onToggleBookmark: (String?) -> Unit,
     modifier: GlanceModifier,
     postLayout: PostLayout,
 ) {
@@ -112,7 +120,7 @@ fun Post(
 fun HorizontalPost(
     post: Post,
     bookmarks: Set<String>,
-    onToggleBookmark: (String) -> Unit,
+    onToggleBookmark: (String?) -> Unit,
     modifier: GlanceModifier,
     showImageThumbnail: Boolean = true
 ) {
@@ -122,29 +130,36 @@ fun HorizontalPost(
         modifier = modifier.clickable(onClick = openPostDetails(context, post))
     ) {
         if (showImageThumbnail) {
-            PostImage(
-                imageId = post.imageThumbId,
-                contentScale = ContentScale.Fit,
-                modifier = GlanceModifier.size(80.dp)
+            AsyncImage(
+                model = ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
+                    .data(post.urlToImage)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Maps sample image",
+                modifier = androidx.compose.ui.Modifier.size(80.dp),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
             )
         } else {
-            PostImage(
-                imageId = post.imageId,
-                contentScale = ContentScale.Crop,
-                modifier = GlanceModifier.width(250.dp)
+            AsyncImage(
+                model = ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
+                    .data(post.urlToImage)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Maps sample image",
+                modifier = androidx.compose.ui.Modifier.size(250.dp),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
             )
         }
         PostDescription(
             title = post.title,
             metadata = context.authorReadTimeString(
-                author = post.metadata.author.name,
-                readTimeMinutes = post.metadata.readTimeMinutes
+                author = post.author
             ),
             modifier = GlanceModifier.defaultWeight().padding(horizontal = 20.dp)
         )
         BookmarkButton(
-            id = post.id,
-            isBookmarked = bookmarks.contains(post.id),
+            id = post.source.id,
+            isBookmarked = bookmarks.contains(post.source.id),
             onToggleBookmark = onToggleBookmark
         )
     }
@@ -154,7 +169,7 @@ fun HorizontalPost(
 fun VerticalPost(
     post: Post,
     bookmarks: Set<String>,
-    onToggleBookmark: (String) -> Unit,
+    onToggleBookmark: (String?) -> Unit,
     modifier: GlanceModifier,
 ) {
     val context = LocalContext.current
@@ -162,21 +177,20 @@ fun VerticalPost(
         verticalAlignment = Alignment.Vertical.CenterVertically,
         modifier = modifier.clickable(onClick = openPostDetails(context, post))
     ) {
-        PostImage(imageId = post.imageId, modifier = GlanceModifier.fillMaxWidth())
+        PostImage(imageId = post.urlToImage, modifier = androidx.compose.ui.Modifier.fillMaxWidth())
         Spacer(modifier = GlanceModifier.height(4.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             PostDescription(
                 title = post.title,
                 metadata = context.authorReadTimeString(
-                    author = post.metadata.author.name,
-                    readTimeMinutes = post.metadata.readTimeMinutes
+                    author = post.author
                 ),
                 modifier = GlanceModifier.defaultWeight()
             )
             Spacer(modifier = GlanceModifier.width(10.dp))
             BookmarkButton(
-                id = post.id,
-                isBookmarked = bookmarks.contains(post.id),
+                id = post.source.id,
+                isBookmarked = bookmarks.contains(post.source.id),
                 onToggleBookmark = onToggleBookmark
             )
         }
@@ -184,7 +198,7 @@ fun VerticalPost(
 }
 
 @Composable
-fun BookmarkButton(id: String, isBookmarked: Boolean, onToggleBookmark: (String) -> Unit) {
+fun BookmarkButton(id: String?, isBookmarked: Boolean, onToggleBookmark: (String?) -> Unit) {
     Image(
         provider = ImageProvider(
             if (isBookmarked) {
@@ -201,32 +215,39 @@ fun BookmarkButton(id: String, isBookmarked: Boolean, onToggleBookmark: (String)
 
 @Composable
 fun PostImage(
-    imageId: Int,
-    contentScale: ContentScale = ContentScale.Crop,
-    modifier: GlanceModifier = GlanceModifier
+    imageId: String?,
+    contentScale: androidx.compose.ui.layout.ContentScale = androidx.compose.ui.layout.ContentScale.Crop,
+    modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier
 ) {
-    Image(
-        provider = ImageProvider(imageId),
-        contentScale = contentScale,
+    AsyncImage(
+        model = ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
+            .data(imageId)
+            .crossfade(true)
+            .build(),
         contentDescription = null,
-        modifier = modifier.cornerRadius(5.dp)
+        modifier = modifier.clip(RoundedCornerShape(5.dp)),
+        contentScale = contentScale,
     )
 }
 
 @Composable
-fun PostDescription(title: String, metadata: String, modifier: GlanceModifier) {
+fun PostDescription(title: String?, metadata: String?, modifier: GlanceModifier) {
     Column(modifier = modifier) {
-        Text(
-            text = title,
-            maxLines = 3,
-            style = JetnewsGlanceTextStyles.bodyLarge
-                .copy(color = GlanceTheme.colors.onBackground)
-        )
+        if (title != null) {
+            Text(
+                text = title,
+                maxLines = 3,
+                style = JetnewsGlanceTextStyles.bodyLarge
+                    .copy(color = GlanceTheme.colors.onBackground)
+            )
+        }
         Spacer(modifier = GlanceModifier.height(4.dp))
-        Text(
-            text = metadata,
-            style = JetnewsGlanceTextStyles.bodySmall
-                .copy(color = GlanceTheme.colors.onBackground)
-        )
+        if (metadata != null) {
+            Text(
+                text = metadata,
+                style = JetnewsGlanceTextStyles.bodySmall
+                    .copy(color = GlanceTheme.colors.onBackground)
+            )
+        }
     }
 }

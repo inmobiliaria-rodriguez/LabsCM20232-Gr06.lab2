@@ -17,12 +17,10 @@
 @file:Suppress("ktlint:max-line-length") // String constants read better
 package com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl
 
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.R
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Markup
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.MarkupType
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Paragraph
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.ParagraphType
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Post
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.PostAuthor
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.PostsFeed
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Publication
@@ -547,92 +545,7 @@ val paragraphsPost3 = listOf(
 val paragraphsPost4 = listOf(
     Paragraph(
         ParagraphType.Text,
-        "TL;DR: Expose resource IDs from ViewModels to avoid showing obsolete data."
-    ),
-    Paragraph(
-        ParagraphType.Text,
-        "In a ViewModel, if you’re exposing data coming from resources (strings, drawables, colors…), you have to take into account that ViewModel objects ignore configuration changes such as locale changes. When the user changes their locale, activities are recreated but the ViewModel objects are not.",
-        listOf(
-            Markup(
-                MarkupType.Bold,
-                183,
-                197
-            )
-        )
-    ),
-    Paragraph(
-        ParagraphType.Text,
-        "AndroidViewModel is a subclass of ViewModel that is aware of the Application context. However, having access to a context can be dangerous if you’re not observing or reacting to the lifecycle of that context. The recommended practice is to avoid dealing with objects that have a lifecycle in ViewModels.",
-        listOf(
-            Markup(MarkupType.Code, 0, 16),
-            Markup(MarkupType.Code, 34, 43),
-            Markup(MarkupType.Bold, 209, 303)
-        )
-    ),
-    Paragraph(
-        ParagraphType.Text,
-        "Let’s look at an example based on this issue in the tracker: Updating ViewModel on system locale change.",
-        listOf(
-            Markup(
-                MarkupType.Link,
-                61,
-                103,
-                "https://issuetracker.google.com/issues/111961971"
-            ),
-            Markup(MarkupType.Italic, 61, 104)
-        )
-    ),
-    Paragraph(
-        ParagraphType.Text,
-        "The problem is that the string is resolved in the constructor only once. If there’s a locale change, the ViewModel won’t be recreated. This will result in our app showing obsolete data and therefore being only partially localized.",
-        listOf(Markup(MarkupType.Bold, 73, 133))
-    ),
-    Paragraph(
-        ParagraphType.Text,
-        "As Sergey points out in the comments to the issue, the recommended approach is to expose the ID of the resource you want to load and do so in the view. As the view (activity, fragment, etc.) is lifecycle-aware it will be recreated after a configuration change so the resource will be reloaded correctly.",
-        listOf(
-            Markup(
-                MarkupType.Link,
-                3,
-                9,
-                "https://twitter.com/ZelenetS"
-            ),
-            Markup(
-                MarkupType.Link,
-                28,
-                36,
-                "https://issuetracker.google.com/issues/111961971#comment2"
-            ),
-            Markup(MarkupType.Bold, 82, 150)
-        )
-    ),
-    Paragraph(
-        ParagraphType.Text,
-        "Even if you don’t plan to localize your app, it makes testing much easier and cleans up your ViewModel objects so there’s no reason not to future-proof."
-    ),
-    Paragraph(
-        ParagraphType.Text,
-        "We fixed this issue in the android-architecture repository in the Java and Kotlin branches and we offloaded resource loading to the Data Binding layout.",
-        listOf(
-            Markup(
-                MarkupType.Link,
-                66,
-                70,
-                "https://github.com/googlesamples/android-architecture/pull/631"
-            ),
-            Markup(
-                MarkupType.Link,
-                75,
-                81,
-                "https://github.com/googlesamples/android-architecture/pull/635"
-            ),
-            Markup(
-                MarkupType.Link,
-                128,
-                151,
-                "https://github.com/googlesamples/android-architecture/pull/635/files#diff-7eb5d85ec3ea4e05ecddb7dc8ae20aa1R62"
-            )
-        )
+        "Oct 24, 2023, 07:13 PM ET\\r\\nEL CAJON, Calif. -- Star Memphis basketball recruit Mikey Williams is facing three additional felony charges in a March 27 shooting and was ordered to personally appear in … [+3354 chars]"
     )
 )
 
@@ -933,98 +846,22 @@ val paragraphsPost5 = listOf(
     )
 )
 
-val post1 = Post(
-    id = "dc523f0ed25c",
-    title = "A Little Thing about Android Module Paths",
-    subtitle = "How to configure your module paths, instead of using Gradle’s default.",
-    url = "https://medium.com/androiddevelopers/gradle-path-configuration-dc523f0ed25c",
-    publication = publication,
-    metadata = com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Metadata(
-        author = pietro,
-        date = "August 02",
-        readTimeMinutes = 1
-    ),
-    paragraphs = paragraphsPost1,
-    imageId = R.drawable.post_1,
-    imageThumbId = R.drawable.post_1_thumb
-)
+//val post1 = Post(
+//    id = "dc523f0ed25c",
+//    title = "A Little Thing about Android Module Paths",
+//    subtitle = "How to configure your module paths, instead of using Gradle’s default.",
+//    url = "https://medium.com/androiddevelopers/gradle-path-configuration-dc523f0ed25c",
+//    publication = publication,
+//    metadata = com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Metadata(
+//        author = pietro,
+//        date = "August 02",
+//        readTimeMinutes = 1
+//    ),
+//    paragraphs = paragraphsPost1,
+//    imageId = R.drawable.post_1,
+//    imageThumbId = R.drawable.post_1_thumb
+//)
 
-val post2 = Post(
-    id = "7446d8dfd7dc",
-    title = "Dagger in Kotlin: Gotchas and Optimizations",
-    subtitle = "Use Dagger in Kotlin! This article includes best practices to optimize your build time and gotchas you might encounter.",
-    url = "https://medium.com/androiddevelopers/dagger-in-kotlin-gotchas-and-optimizations-7446d8dfd7dc",
-    publication = publication,
-    metadata = com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Metadata(
-        author = manuel,
-        date = "July 30",
-        readTimeMinutes = 3
-    ),
-    paragraphs = paragraphsPost2,
-    imageId = R.drawable.post_2,
-    imageThumbId = R.drawable.post_2_thumb
-)
 
-val post3 = Post(
-    id = "ac552dcc1741",
-    title = "From Java Programming Language to Kotlin — the idiomatic way",
-    subtitle = "Learn how to get started converting Java Programming Language code to Kotlin, making it more idiomatic and avoid common pitfalls, by…",
-    url = "https://medium.com/androiddevelopers/from-java-programming-language-to-kotlin-the-idiomatic-way-ac552dcc1741",
-    publication = publication,
-    metadata = com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Metadata(
-        author = florina,
-        date = "July 09",
-        readTimeMinutes = 1
-    ),
-    paragraphs = paragraphsPost3,
-    imageId = R.drawable.post_3,
-    imageThumbId = R.drawable.post_3_thumb
-)
 
-val post4 = Post(
-    id = "84eb677660d9",
-    title = "Locale changes and the AndroidViewModel antipattern",
-    subtitle = "TL;DR: Expose resource IDs from ViewModels to avoid showing obsolete data.",
-    url = "https://medium.com/androiddevelopers/locale-changes-and-the-androidviewmodel-antipattern-84eb677660d9",
-    publication = publication,
-    metadata = com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Metadata(
-        author = jose,
-        date = "April 02",
-        readTimeMinutes = 1
-    ),
-    paragraphs = paragraphsPost4,
-    imageId = R.drawable.post_4,
-    imageThumbId = R.drawable.post_4_thumb
-)
-
-val post5 = Post(
-    id = "55db18283aca",
-    title = "Collections and sequences in Kotlin",
-    subtitle = "Working with collections is a common task and the Kotlin Standard Library offers many great utility functions. It also offers two ways of…",
-    url = "https://medium.com/androiddevelopers/collections-and-sequences-in-kotlin-55db18283aca",
-    publication = publication,
-    metadata = com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Metadata(
-        author = florina,
-        date = "July 24",
-        readTimeMinutes = 4
-    ),
-    paragraphs = paragraphsPost5,
-    imageId = R.drawable.post_5,
-    imageThumbId = R.drawable.post_5_thumb
-)
-
-val posts: PostsFeed =
-    PostsFeed(
-        highlightedPost = post4,
-        recommendedPosts = listOf(post1, post2, post3),
-        popularPosts = listOf(
-            post5,
-            post1.copy(id = "post6"),
-            post2.copy(id = "post7")
-        ),
-        recentPosts = listOf(
-            post3.copy(id = "post8"),
-            post4.copy(id = "post9"),
-            post5.copy(id = "post10")
-        )
-    )
+val posts: PostsFeed = PostsFeed()

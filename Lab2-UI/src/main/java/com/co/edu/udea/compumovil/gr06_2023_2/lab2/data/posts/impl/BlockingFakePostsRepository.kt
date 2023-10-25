@@ -18,7 +18,6 @@ package com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl
 
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.Result
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.PostsRepository
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Post
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.PostsFeed
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.utils.addOrRemove
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +41,7 @@ class BlockingFakePostsRepository : PostsRepository {
 
     override suspend fun getPost(postId: String?): Result<Post> {
         return withContext(Dispatchers.IO) {
-            val post = posts.allPosts.find { it.id == postId }
+            val post = posts.allPosts.find { it.source.id == postId }
             if (post == null) {
                 Result.Error(IllegalArgumentException("Unable to find post"))
             } else {
@@ -59,7 +58,7 @@ class BlockingFakePostsRepository : PostsRepository {
     override fun observeFavorites(): Flow<Set<String>> = favorites
     override fun observePostsFeed(): Flow<PostsFeed?> = postsFeed
 
-    override suspend fun toggleFavorite(postId: String) {
+    override suspend fun toggleFavorite(postId: String?) {
         favorites.update { it.addOrRemove(postId) }
     }
 }

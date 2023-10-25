@@ -49,9 +49,9 @@ import androidx.glance.layout.size
 import androidx.glance.layout.width
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.JetnewsApplication
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.R
+import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.Post
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.successOr
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.glance.ui.theme.JetnewsGlanceColorScheme
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Post
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -103,7 +103,7 @@ class JetnewsGlanceAppWidget : GlanceAppWidget() {
     private fun JetnewsContent(
         posts: List<Post>,
         bookmarks: Set<String>?,
-        onToggleBookmark: (String) -> Unit
+        onToggleBookmark: (String?) -> Unit
     ) {
         Column(
             modifier = GlanceModifier
@@ -152,7 +152,7 @@ class JetnewsGlanceAppWidget : GlanceAppWidget() {
         modifier: GlanceModifier,
         posts: List<Post>,
         bookmarks: Set<String>,
-        onToggleBookmark: (String) -> Unit,
+        onToggleBookmark: (String?) -> Unit,
     ) {
         val postLayout = LocalSize.current.toPostLayout()
         LazyColumn(modifier = modifier.background(GlanceTheme.colors.background)) {

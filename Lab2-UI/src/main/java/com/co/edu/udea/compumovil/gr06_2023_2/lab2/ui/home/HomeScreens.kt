@@ -97,7 +97,7 @@ import androidx.compose.ui.unit.dp
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.R
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.Result
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.BlockingFakePostsRepository
-import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.Post
+import com.co.edu.udea.compumovil.gr06_2023_2.lab2.data.posts.impl.Post
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.model.PostsFeed
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.ui.article.postContentItems
 import com.co.edu.udea.compumovil.gr06_2023_2.lab2.ui.article.sharePost
@@ -123,15 +123,15 @@ import kotlinx.coroutines.runBlocking
 fun HomeFeedWithArticleDetailsScreen(
     uiState: HomeUiState,
     showTopAppBar: Boolean,
-    onToggleFavorite: (String) -> Unit,
-    onSelectPost: (String) -> Unit,
+    onToggleFavorite: (String?) -> Unit,
+    onSelectPost: (String?) -> Unit,
     onRefreshPosts: () -> Unit,
     onErrorDismiss: (Long) -> Unit,
     onInteractWithList: () -> Unit,
-    onInteractWithDetail: (String) -> Unit,
+    onInteractWithDetail: (String?) -> Unit,
     openDrawer: () -> Unit,
     homeListLazyListState: LazyListState,
-    articleDetailLazyListStates: Map<String, LazyListState>,
+    articleDetailLazyListStates: Map<String?, LazyListState>,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     onSearchInputChanged: (String) -> Unit,
@@ -165,16 +165,16 @@ fun HomeFeedWithArticleDetailsScreen(
                 onSearchInputChanged = onSearchInputChanged,
             )
             // Crossfade between different detail posts
-            Crossfade(targetState = hasPostsUiState.selectedPost) { detailPost ->
+            Crossfade(targetState = hasPostsUiState.selectedPost, label = "") { detailPost: Post ->
                 // Get the lazy list state for this detail view
                 val detailLazyListState by remember {
                     derivedStateOf {
-                        articleDetailLazyListStates.getValue(detailPost.id)
+                        articleDetailLazyListStates.getValue(detailPost.source.id)
                     }
                 }
 
                 // Key against the post id to avoid sharing any state between different posts
-                key(detailPost.id) {
+                key(detailPost.source.id) {
                     LazyColumn(
                         state = detailLazyListState,
                         contentPadding = contentPadding,
@@ -182,14 +182,14 @@ fun HomeFeedWithArticleDetailsScreen(
                             .padding(horizontal = 16.dp)
                             .fillMaxSize()
                             .notifyInput {
-                                onInteractWithDetail(detailPost.id)
+                                onInteractWithDetail(detailPost.source.id)
                             }
                     ) {
                         stickyHeader {
                             val context = LocalContext.current
                             PostTopBar(
-                                isFavorite = hasPostsUiState.favorites.contains(detailPost.id),
-                                onToggleFavorite = { onToggleFavorite(detailPost.id) },
+                                isFavorite = hasPostsUiState.favorites.contains(detailPost.source.id),
+                                onToggleFavorite = { onToggleFavorite(detailPost.source.id) },
                                 onSharePost = { sharePost(detailPost, context) },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -227,8 +227,8 @@ private fun Modifier.notifyInput(block: () -> Unit): Modifier =
 fun HomeFeedScreen(
     uiState: HomeUiState,
     showTopAppBar: Boolean,
-    onToggleFavorite: (String) -> Unit,
-    onSelectPost: (String) -> Unit,
+    onToggleFavorite: (String?) -> Unit,
+    onSelectPost: (String?) -> Unit,
     onRefreshPosts: () -> Unit,
     onErrorDismiss: (Long) -> Unit,
     openDrawer: () -> Unit,
@@ -413,8 +413,8 @@ private fun PostList(
     postsFeed: PostsFeed,
     favorites: Set<String>,
     showExpandedSearch: Boolean,
-    onArticleTapped: (postId: String) -> Unit,
-    onToggleFavorite: (String) -> Unit,
+    onArticleTapped: (postId: String?) -> Unit?,
+    onToggleFavorite: (String?) -> Unit?,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     state: LazyListState = rememberLazyListState(),
@@ -446,16 +446,6 @@ private fun PostList(
                 )
             }
         }
-        if (postsFeed.popularPosts.isNotEmpty() && !showExpandedSearch) {
-            item {
-                PostListPopularSection(
-                    postsFeed.popularPosts, onArticleTapped
-                )
-            }
-        }
-        if (postsFeed.recentPosts.isNotEmpty()) {
-            item { PostListHistorySection(postsFeed.recentPosts, onArticleTapped) }
-        }
     }
 }
 
@@ -480,7 +470,7 @@ private fun FullScreenLoading() {
  * @param navigateToArticle (event) request navigation to Article screen
  */
 @Composable
-private fun PostListTopSection(post: Post, navigateToArticle: (String) -> Unit) {
+private fun PostListTopSection(post: Post, navigateToArticle: (String?) -> Unit) {
     Text(
         modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
         text = stringResource(id = R.string.home_top_section_title),
@@ -488,7 +478,7 @@ private fun PostListTopSection(post: Post, navigateToArticle: (String) -> Unit) 
     )
     PostCardTop(
         post = post,
-        modifier = Modifier.clickable(onClick = { navigateToArticle(post.id) })
+        modifier = Modifier.clickable(onClick = { navigateToArticle(post.source.id) })
     )
     PostListDivider()
 }
@@ -504,71 +494,16 @@ private fun PostListSimpleSection(
     posts: List<Post>,
     navigateToArticle: (String) -> Unit,
     favorites: Set<String>,
-    onToggleFavorite: (String) -> Unit
+    onToggleFavorite: (String?) -> Unit
 ) {
     Column {
         posts.forEach { post ->
             PostCardSimple(
                 post = post,
                 navigateToArticle = navigateToArticle,
-                isFavorite = favorites.contains(post.id),
-                onToggleFavorite = { onToggleFavorite(post.id) }
+                isFavorite = favorites.contains(post.source.id),
+                onToggleFavorite = { onToggleFavorite(post.source.id) }
             )
-            PostListDivider()
-        }
-    }
-}
-
-/**
- * Horizontal scrolling cards for [PostList]
- *
- * @param posts (state) to display
- * @param navigateToArticle (event) request navigation to Article screen
- */
-@Composable
-private fun PostListPopularSection(
-    posts: List<Post>,
-    navigateToArticle: (String) -> Unit
-) {
-    Column {
-        Text(
-            modifier = Modifier.padding(16.dp),
-            text = stringResource(id = R.string.home_popular_section_title),
-            style = MaterialTheme.typography.titleLarge
-        )
-        Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .height(IntrinsicSize.Max)
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            for (post in posts) {
-                PostCardPopular(
-                    post,
-                    navigateToArticle
-                )
-            }
-        }
-        Spacer(Modifier.height(16.dp))
-        PostListDivider()
-    }
-}
-
-/**
- * Full-width list items that display "based on your history" for [PostList]
- *
- * @param posts (state) to display
- * @param navigateToArticle (event) request navigation to Article screen
- */
-@Composable
-private fun PostListHistorySection(
-    posts: List<Post>,
-    navigateToArticle: (String) -> Unit
-) {
-    Column {
-        posts.forEach { post ->
-            PostCardHistory(post, navigateToArticle)
             PostListDivider()
         }
     }
@@ -812,8 +747,8 @@ fun PreviewHomeListDetailScreen() {
             openDrawer = {},
             homeListLazyListState = rememberLazyListState(),
             articleDetailLazyListStates = postsFeed.allPosts.associate { post ->
-                key(post.id) {
-                    post.id to rememberLazyListState()
+                key(post.source.id) {
+                    post.source.id to rememberLazyListState()
                 }
             },
             snackbarHostState = SnackbarHostState(),

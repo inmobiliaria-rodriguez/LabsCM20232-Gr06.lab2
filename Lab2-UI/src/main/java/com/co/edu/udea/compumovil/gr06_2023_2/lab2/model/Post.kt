@@ -18,22 +18,10 @@ package com.co.edu.udea.compumovil.gr06_2023_2.lab2.model
 
 import androidx.annotation.DrawableRes
 
-data class Post(
-    val id: String,
-    val title: String,
-    val subtitle: String? = null,
-    val url: String,
-    val publication: Publication? = null,
-    val metadata: Metadata,
-    val paragraphs: List<Paragraph> = emptyList(),
-    @DrawableRes val imageId: Int,
-    @DrawableRes val imageThumbId: Int
-)
 
 data class Metadata(
-    val author: PostAuthor,
-    val date: String,
-    val readTimeMinutes: Int
+    val author: String?,
+    val date: String?
 )
 
 data class PostAuthor(
@@ -47,9 +35,7 @@ data class Publication(
 )
 
 data class Paragraph(
-    val type: ParagraphType,
-    val text: String,
-    val markups: List<Markup> = emptyList()
+    val text: String? = null
 )
 
 data class Markup(
